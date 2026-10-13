@@ -93,20 +93,20 @@ var GICON={"Bread":I.loaf,"Gluten free":I.loaf,"Dough":I.roll,"Cake":I.cake,"Jam
 
 
 /* ---------- photos (Unsplash License, self-hosted in img/) ---------- */
-var PHOTO={"White Loaf":"white","Rapid White Loaf":"white","Basic Sandwich Bread":"white","Kumara Bread":"white","Cheese & Mustard Loaf":"white","Mexican Chilli Loaf":"white","Curry & Onion Loaf":"white",
+var PHOTO={"White Loaf":"white","Rapid White Loaf":"white","Basic Sandwich Bread":"sandwich","Whole Wheat Sandwich Bread":"wwsandwich",
+ "Garlic Herb Bread":"garlic","Kumara Bread":"rustic","Cheese & Mustard Loaf":"cheese","Mexican Chilli Loaf":"roundloaf","Curry & Onion Loaf":"curry",
+ "Rosemary & Pinenut Loaf":"basket","Banana Cinnamon Loaf":"bananatoast","Chocolate Nut Bread":"chocolate","Spicy Fruit Loaf":"loafcake","Spicy Fruit Loaf (wholemeal)":"loafcake",
+ "Wholemeal Loaf 75%":"wholemeal","Wholemeal Loaf 100%":"wholemeal","Wholemeal Loaf 50%":"wholemeal","Rapid Wholemeal Loaf 75%":"wholemeal",
+ "Rosemary & Thyme Loaf":"rustic","Sesame & Bran Loaf":"seeds","Orange Poppyseed Loaf":"citrus","Date & Nut Loaf":"almonds","Mixed Grain Bread":"darkloaves",
+ "Rye 100%":"rye","Rye and Wholemeal":"ryeslice","French Bread":"baguette","Tarragon & Thyme Bread":"bakeryshelf","Italian Bread":"roundloaf","Herb Bread":"rustic","Sundried Tomato and Parmesan":"tomatobasil",
+ "Basic Brioche":"briochetoast","Pannettone":"bakery","Spelt White Bread":"wheatfield","Whole Spelt Bread":"ryeslice","Rye and Spelt":"rye",
  "Wheat and Gluten Free Bread":"white","Yeasted Plain Gluten Free Loaf":"white",
- "Garlic Herb Bread":"rustic","Rosemary & Pinenut Loaf":"rustic","Spelt White Bread":"rustic","Rosemary & Thyme Loaf":"basket",
- "Italian Bread":"roundloaf","Herb Bread":"roundloaf","Sundried Tomato and Parmesan":"roundloaf",
- "French Bread":"baguette","Tarragon & Thyme Bread":"baguette","French Bread (dough)":"baguette",
- "Wholemeal Loaf 75%":"wholemeal","Wholemeal Loaf 100%":"wholemeal","Wholemeal Loaf 50%":"wholemeal","Rapid Wholemeal Loaf 75%":"wholemeal","Whole Wheat Sandwich Bread":"wholemeal","Sesame & Bran Loaf":"wholemeal",
- "Rye 100%":"rye","Rye and Wholemeal":"rye","Mixed Grain Bread":"rye","Rye and Spelt":"ryeslice","Whole Spelt Bread":"ryeslice","Rye & White Rolls (stage 1)":"basket","Rye & White Rolls (stage 2)":"basket",
- "Chocolate Nut Bread":"chocslice","Chocolate Cake":"chocolatecake","Butter Cake":"buttercake","Fruit & Walnut Cake":"berrycake",
- "Banana Yoghurt Tea Bread":"loafcake","Date & Nut Loaf":"loafcake","Spicy Fruit Loaf":"loafcake","Spicy Fruit Loaf (wholemeal)":"loafcake","Banana Cinnamon Loaf":"loafcake","Orange Poppyseed Loaf":"loafcake",
- "Basic Brioche":"pastries","Chocolate Chip Brioche Rolls (12)":"pastries","Pannettone":"bakery",
- "Basic Dough":"rolls","Wholemeal Dough 75%":"rolls","Olive & Rosemary Rolls":"rolls","Sundried Tomato & Basil Rolls":"rolls","Sunflower & Kibblewheat Rolls":"rolls","Spelt Table Rolls (8)":"rolls","Whole Wheat Raisin Rolls":"rolls",
- "Croissants":"croissants","Doughnuts":"doughnuts","Hot Cross Buns":"cinnamon","Swedish Tea Ring":"cinnamon","Bagels":"bagels","Pizza":"pizza","Focaccia":"focaccia",
+ "Basic Dough":"kneading","Wholemeal Dough 75%":"rolls","Croissants":"croissants","Doughnuts":"doughnuts","Hot Cross Buns":"cinnamon","Olive & Rosemary Rolls":"rollsbasket","Swedish Tea Ring":"cinnamon",
+ "Sundried Tomato & Basil Rolls":"rolls","Bagels":"bagels","Whole Wheat Raisin Rolls":"rolls","Sunflower & Kibblewheat Rolls":"rolls","Rye & White Rolls (stage 1)":"basket","Rye & White Rolls (stage 2)":"basket",
+ "French Bread (dough)":"baguette","Chocolate Chip Brioche Rolls (12)":"pastries","Spelt Table Rolls (8)":"rollsbasket","Pizza":"pizza","Focaccia":"focaccia",
+ "Butter Cake":"buttercake","Fruit & Walnut Cake":"spicecake","Chocolate Cake":"chocolatecake","Banana Yoghurt Tea Bread":"loafcake",
  "Strawberry Jam":"strawberries","Blueberry Jam":"blueberries","Peach Melba":"peaches","Frozen Berry Jam":"raspberries",
- "Spiced Apple Compote":"apple","Mixed Berry Compote":"raspberries","Apple Sauce":"apples","Peach in Vanilla Syrup":"peaches"};
+ "Spiced Apple Compote":"apples","Mixed Berry Compote":"raspberries","Apple Sauce":"greenapples","Peach in Vanilla Syrup":"peaches"};
 var GPHOTO={"Bread":"white","Gluten free":"white","Dough":"rolls","Cake":"buttercake","Jam":"strawberries","Compote":"apples"};
 function photo(r){return "img/"+(PHOTO[r.p||r.n]||GPHOTO[r.g])+".jpg"}
 
