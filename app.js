@@ -155,7 +155,7 @@ function drawCards(){
  $("count").textContent=list.length+" of "+R.length;
  var fl=st.diet.map(function(k){return DIET.filter(function(d){return d[0]===k})[0][1].toLowerCase()});
  $("head").textContent=(st.view==="saved"?"Saved recipes":(st.grp==="All"?"All recipes":st.grp))+(fl.length?" · "+fl.join(" + "):"")+(st.times.length?" · "+st.times.length+" time range"+(st.times.length>1?"s":""):"");
- if(!list.length){$("cards").innerHTML='<div class="empty">'+(st.view==="saved"?"No saved recipes yet. Tap the heart on a recipe to keep it here.":"Nothing matches. Clear the search or pick another filter.")+'</div>';return}
+ if(!list.length){$("cards").innerHTML='<div class="empty">'+(st.view==="saved"?"No saved recipes yet. Tap the heart on a recipe to keep it here.<br><br><button class=\"btn olive\" data-nav=\"home\">Browse recipes</button>":"Nothing matches. Clear the search or pick another filter.")+'</div>';return}
  $("cards").innerHTML=list.map(function(r,k){
   var i=R.indexOf(r),kc=kcalPerServe(r);
   return '<article class="card" style="animation-delay:'+Math.min(k,12)*40+'ms"><div class="visual '+GCLASS[r.g]+'" role="button" tabindex="0" data-open="'+i+'" aria-label="Open '+esc(r.n)+'"><img class="ph" src="'+photo(r)+'" alt="" loading="lazy" decoding="async">'+
@@ -172,8 +172,9 @@ function drawMenu(){
  h+='</tbody></table></div><p class="legend"><span class="dot"></span> means the option is available (loaf size M/L/XL, crust Light/Medium/Dark, delayed-start timer). Process times vary with room temperature. Bake only (15), Jam (26) and Compote (27) set their cooking time with the Timer pad. The raisin nut dispenser works on menus 03, 06, 14, 17, 19 and 25 and holds up to 150 g; Rye, Italian and Gluten Free do not use it. Tap a recipe count to open those recipes.</p>';
  $("menu").innerHTML=h;
 }
-function setView(v){
+function setView(v,quiet){
  st.view=v;
+ if(!quiet){try{history.replaceState(null,"",v==="home"?location.pathname:"#"+v)}catch(e){}}
  $("home").hidden=v==="menus"||v==="create";$("menu").hidden=v!=="menus";$("recipes").hidden=v==="menus"||v==="create";$("create").hidden=v!=="create";
  if(v==="create")drawCreate();
  ["home","menus","saved","create"].forEach(function(k){$("nav-"+k).setAttribute("aria-pressed",v===k)});
@@ -183,8 +184,10 @@ function setView(v){
 }
 
 /* ---------- sheet ---------- */
+var opener=null;
 function openSheet(i){
- st.open=i;st.tab="ing";st.step=0;st.serves=null;
+ st.open=i;st.tab="ing";st.step=0;st.serves=null;opener=document.activeElement;
+ try{history.pushState({sheet:i},"")}catch(e){}
  var r=R[i];
  $("sheet-hero").className="sheet-hero "+GCLASS[r.g];$("sheet-hero").style.backgroundImage="url('"+photo(r)+"')";
  $("sheet-title").textContent=r.n;
@@ -194,10 +197,20 @@ function openSheet(i){
  requestAnimationFrame(function(){$("scrim").classList.add("show");$("sheet").classList.add("show")});
  document.body.style.overflow="hidden";$("close").focus();
 }
-function closeSheet(){
+function closeSheet(fromHistory){
+ if(st.open==null)return;
  $("scrim").classList.remove("show");$("sheet").classList.remove("show");document.body.style.overflow="";
  setTimeout(function(){$("scrim").hidden=true;$("sheet").hidden=true},450);st.open=null;
+ if(!fromHistory&&history.state&&history.state.sheet!=null){try{history.back()}catch(e){}}
+ if(opener&&opener.focus){opener.focus();opener=null}
 }
+/* keep Tab inside the open sheet */
+document.addEventListener("keydown",function(e){
+ if(e.key!=="Tab"||st.open==null)return;
+ var f=$("sheet").querySelectorAll("button:not([disabled]),input,select,[tabindex]:not([tabindex=\"-1\"])");if(!f.length)return;
+ var first=f[0],last=f[f.length-1];
+ if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}
+});
 function drawSheet(){
  var r=R[st.open],x=regionRows(r),h='';
  h+='<div class="tabs"><button aria-pressed="'+(st.tab==="ing")+'" data-tab="ing">Ingredients</button><button aria-pressed="'+(st.tab==="nut")+'" data-tab="nut">Nutrition</button><button aria-pressed="'+(st.tab==="how")+'" data-tab="how">Method</button></div>';
@@ -328,9 +341,20 @@ function drawCreate(){
  $("create").innerHTML=h;
  var cq=$("c-q");if(cq){cq.addEventListener("input",function(e){cr.q=e.target.value;var at=e.target.selectionStart;drawCreate();var n=$("c-q");n.focus();n.setSelectionRange(at,at)})}
 }
+function addIn(name,qty,unit){
+ name=String(name||"").replace(/\s+/g," ").trim();
+ if(name.length<2||name.length>40){toast("Ingredient name: 2 to 40 characters");return}
+ if(!(qty>0)||qty>2000){toast("Enter a quantity between 0 and 2000");return}
+ if(UNITS.indexOf(unit)<0)unit="g";
+ if(cr.adds.length>=10){toast("Up to 10 add-ins per recipe");return}
+ var dup=cr.adds.filter(function(a){return a.name.toLowerCase()===name.toLowerCase()&&a.unit===unit})[0];
+ if(dup){dup.qty=Math.round((dup.qty+qty)*100)/100;toast("Added to "+dup.name)}else cr.adds.push({name:name,qty:Math.round(qty*100)/100,unit:unit});
+ drawCreate();var ni=$("c-name");if(ni){ni.value="";$("c-qty").value="";ni.focus()}
+}
 function saveCustom(){
- var out=build(),b=cr.base,name=($("c-title").value||"").trim();
- if(!name){toast("Give the recipe a name");return}
+ var out=build(),b=cr.base,name=($("c-title").value||"").replace(/\s+/g," ").trim();
+ if(name.length<2||name.length>60){toast("Recipe name: 2 to 60 characters");return}
+ if(!cr.adds.length){toast("Add at least one ingredient");return}
  if(R.some(function(c){return c.n===name})){toast("A recipe with that name already exists");return}
  var rec={n:name,g:b.g,m:[out.menu],time:out.time,timer:out.timer,sz:1,custom:true,p:b.n,
   both:out.rows.map(function(r){return (r.late?"*":"")+r.name+"|"+r.qty}),
@@ -349,8 +373,8 @@ document.addEventListener("click",function(e){
  if(b.id==="close"||d.close)return closeSheet();
  if(d.delcustom){CUSTOM=CUSTOM.filter(function(c){return c.n!==d.delcustom});var ri=R.findIndex(function(c){return c.n===d.delcustom});if(ri>=0)R.splice(ri,1);delete st.favs[d.delcustom];save();closeSheet();drawCards();toast("Recipe deleted");return}
  if(d.pick){cr.base=R.filter(function(c){return !c.custom})[+d.pick]||null;cr.adds=cr.adds;return drawCreate()}
- if(d.quick){var qk=QUICK[+d.quick];cr.adds.push({name:qk[0],qty:qk[1],unit:qk[2]});return drawCreate()}
- if(d.addrow){var nm=$("c-name").value.trim(),qv=parseFloat($("c-qty").value);if(!nm||!(qv>0)){toast("Enter an ingredient and a quantity");return}cr.adds.push({name:nm,qty:qv,unit:$("c-unit").value});return drawCreate()}
+ if(d.quick){var qk=QUICK[+d.quick];return addIn(qk[0],qk[1],qk[2])}
+ if(d.addrow){return addIn($("c-name").value,parseFloat($("c-qty").value),$("c-unit").value)}
  if(d.rm!=null){cr.adds.splice(+d.rm,1);return drawCreate()}
  if(d.savecustom){return saveCustom()}
  if(d.cbase){cr.base=null;cr.adds=[];return drawCreate()}
@@ -374,7 +398,14 @@ document.addEventListener("keydown",function(e){
  if((e.key==="Enter"||e.key===" ")&&e.target.dataset&&e.target.dataset.open!=null){e.preventDefault();openSheet(+e.target.dataset.open)}
 });
 $("scrim").addEventListener("click",closeSheet);
+document.addEventListener("keydown",function(e){if(e.key==="Enter"&&(e.target.id==="c-name"||e.target.id==="c-qty")){e.preventDefault();addIn($("c-name").value,parseFloat($("c-qty").value),$("c-unit").value)}if(e.key==="Enter"&&e.target.id==="c-title"){e.preventDefault();saveCustom()}});
 $("q").addEventListener("input",function(e){st.q=e.target.value;if(st.view==="menus")setView("home");else drawCards()});
 
-drawChips();drawMenu();setView("home");
+drawChips();drawMenu();
+var h0=(location.hash||"").slice(1);setView(["menus","saved","create"].indexOf(h0)>=0?h0:"home");
+window.addEventListener("popstate",function(){if(st.open!=null)closeSheet(true);else{var hv=(location.hash||"").slice(1);setView(["menus","saved","create"].indexOf(hv)>=0?hv:"home",true)}});
+window.addEventListener("hashchange",function(){var hv=(location.hash||"").slice(1);var v=["menus","saved","create"].indexOf(hv)>=0?hv:"home";if(v!==st.view)setView(v,true)});
+document.addEventListener("keydown",function(e){if(e.key==="/"&&document.activeElement.tagName!=="INPUT"&&document.activeElement.tagName!=="SELECT"){e.preventDefault();if(st.view!=="home")setView("home");$("q").focus()}});
+/* swipe down to close the sheet on touch */
+(function(){var y0=null,sheet=$("sheet");sheet.addEventListener("touchstart",function(e){y0=sheet.scrollTop===0?e.touches[0].clientY:null},{passive:true});sheet.addEventListener("touchmove",function(e){if(y0!=null){var dy=e.touches[0].clientY-y0;if(dy>0)sheet.style.transform="translateY("+dy+"px)"}},{passive:true});sheet.addEventListener("touchend",function(e){if(y0==null)return;var dy=e.changedTouches[0].clientY-y0;sheet.style.transform="";if(dy>110)closeSheet();y0=null})})();
 })();
