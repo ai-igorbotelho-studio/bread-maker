@@ -160,7 +160,7 @@ var R=[
  nz:["Water|430 mL","Vegetable oil|60 mL","Healtheries Simple Bread Mix|500 g","ACTIVE YEAST (gluten free yeast)|1¾ tsp"],
  note:"Menu 12, Dark crust for NZ. Add ingredients in this order: water, salt, fat, gluten free mix, dry yeast. The raisin nut dispenser does not work on this program. Consume within two days. Wash the pan and blade carefully if you avoid cross-contamination."},
 {n:"Yeasted Plain Gluten Free Loaf",g:"Gluten free",m:["01"],time:"2 hr",timer:0,sz:1,
- oz:["Water|430–450 mL","Oil (Canola/Sunflower)|⅓ cup","Eggs, medium|3","White vinegar (not malt)|1 tsp","Brown rice flour|1 cup","White rice flour|1 cup","Arrowroot or tapioca flour|1 cup","Besan (chick pea) flour or soya flour|½ cup","White or brown rice flour|½ cup","Salt|1–1½ tsp","Sugar|2 tbsp","Xantan gum|1 tbsp","Dry yeast (not rapid rise)|2 tsp"],
+ both:["Water|430–450 mL","Oil (Canola/Sunflower)|⅓ cup","Eggs, medium|3","White vinegar (not malt)|1 tsp","Brown rice flour|1 cup","White rice flour|1 cup","Arrowroot or tapioca flour|1 cup","Besan (chick pea) flour or soya flour|½ cup","White or brown rice flour|½ cup","Salt|1–1½ tsp","Sugar|2 tbsp","Xantan gum|1 tbsp","Dry yeast (not rapid rise)|2 tsp"],
  note:"Menu 01, XL size, Dark crust (same recipe for Australia and NZ). Assist the kneading for the first 5–10 minutes with a spatula. The dough should look like thick cake mix. If too thin add 2–4 tbsp rice flour, if too thick add 1–3 tbsp water. Variations: fruit loaf adds brown sugar 3 tbsp, cinnamon 1 tsp and dried fruit 1 cup. Cheese loaf adds grated cheese 1 cup. Seeded loaf uses water 450–480 mL and 3 tbsp seed mix."},
 
 /* ---------- DOUGH ---------- */

@@ -12,7 +12,7 @@ Or from a terminal with Wrangler: `npx wrangler pages deploy . --project-name br
 
 ## Content
 
-- `data.js` holds the 27-menu chart and 67 recipes transcribed from the SD-2501 Operating Instructions and Recipes booklet (pages 10–11 and 21–40), with both Australian and New Zealand quantities.
+- `data.js` holds the 27-menu chart and 67 recipes transcribed from the SD-2501 Operating Instructions and Recipes booklet (pages 10–11 and 21–40), using the New Zealand quantities (the manual also prints Australian ones, kept in `data.js` under `oz` but not shown).
 - Nutrition figures are estimates computed in `app.js` from typical nutrient values per ingredient. They are not from Panasonic.
 
 ## Photos

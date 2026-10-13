@@ -63,9 +63,9 @@ function nutrition(rows){
 var SIZES=["M","L","XL"],GRPS=["All","Bread","Gluten free","Dough","Cake","Jam","Compote"];
 var GCLASS={"Bread":"g-bread","Gluten free":"g-gluten","Dough":"g-dough","Cake":"g-cake","Jam":"g-jam","Compote":"g-compote"};
 var SERVES={"Bread":[12,14,16],"Gluten free":[12,12,12],"Dough":[12,12,12],"Cake":[10,10,10],"Jam":[20,20,20],"Compote":[20,20,20]};
-var st={view:"home",reg:"NZ",size:1,grp:"All",menu:"All",q:"",favs:{},open:null,tab:"ing",step:0,serves:null};
-try{var sv=JSON.parse(localStorage.getItem("bm")||"{}");if(sv.reg)st.reg=sv.reg;if(sv.size!=null)st.size=sv.size;if(sv.favs)st.favs=sv.favs;if(sv.theme)document.documentElement.setAttribute("data-theme",sv.theme)}catch(e){}
-function save(){try{localStorage.setItem("bm",JSON.stringify({reg:st.reg,size:st.size,favs:st.favs,theme:document.documentElement.getAttribute("data-theme")||""}))}catch(e){}}
+var st={view:"home",size:1,grp:"All",menu:"All",q:"",favs:{},open:null,tab:"ing",step:0,serves:null};
+try{var sv=JSON.parse(localStorage.getItem("bm")||"{}");if(sv.size!=null)st.size=sv.size;if(sv.favs)st.favs=sv.favs;if(sv.theme)document.documentElement.setAttribute("data-theme",sv.theme)}catch(e){}
+function save(){try{localStorage.setItem("bm",JSON.stringify({size:st.size,favs:st.favs,theme:document.documentElement.getAttribute("data-theme")||""}))}catch(e){}}
 function $(i){return document.getElementById(i)}
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
 
@@ -106,8 +106,8 @@ function photo(r){return "img/"+(PHOTO[r.n]||GPHOTO[r.g])+".jpg"}
 
 /* ---------- helpers ---------- */
 function regionRows(r){
- var key=st.reg==="NZ"?"nz":"oz",other=key==="nz"?"oz":"nz",d=r.both||r[key],note="";
- if(!d){d=r[other];note="The manual prints no "+(st.reg==="NZ"?"NZ":"Australian")+" version of this recipe, so these are the "+(other==="nz"?"NZ":"Australian")+" quantities."}
+ var d=r.both||r.nz,note="";
+ if(!d){d=r.oz;note="The manual prints this recipe for Australia only, so these are its Australian quantities (dry yeast and bread flour rather than Surebake yeast and white flour)."}
  var rows=(d||[]).map(function(line){var p=line.split("|"),late=p[0].charAt(0)==="*";
   return {name:late?p[0].slice(1):p[0],late:late,qty:r.sz===3&&p.length>2?p[1+st.size]:p[1]}});
  return {rows:rows,note:note};
@@ -134,7 +134,6 @@ function drawChips(){
  $("chips").innerHTML=GRPS.map(function(g){return '<button class="chip" aria-pressed="'+(st.grp===g)+'" data-grp="'+esc(g)+'">'+esc(g)+'</button>'}).join("");
  var ms={};R.forEach(function(r){r.m.forEach(function(m){ms[m]=1})});
  $("mchips").innerHTML='<button class="chip'+(st.menu==="All"?" on":"")+'" data-menu="All">All menus</button>'+Object.keys(ms).sort().map(function(m){return '<button class="chip'+(st.menu===m?" on":"")+'" data-menu="'+m+'">Menu '+m+'</button>'}).join("");
- $("reg").innerHTML='<button aria-pressed="'+(st.reg==="NZ")+'" data-reg="NZ">NZ</button><button aria-pressed="'+(st.reg==="OZ")+'" data-reg="OZ">Australia</button>';
  $("size").innerHTML=SIZES.map(function(s,i){return '<button aria-pressed="'+(st.size===i)+'" data-size="'+i+'">'+s+'</button>'}).join("");
 }
 function drawCards(){
@@ -188,8 +187,7 @@ function drawSheet(){
  h+='<div class="tabs"><button aria-pressed="'+(st.tab==="ing")+'" data-tab="ing">Ingredients</button><button aria-pressed="'+(st.tab==="nut")+'" data-tab="nut">Nutrition</button><button aria-pressed="'+(st.tab==="how")+'" data-tab="how">Method</button></div>';
  if(st.tab==="ing"){
   h+='<div class="pane">';
-  if(r.sz===3)h+='<div class="row"><span class="small">Loaf size</span><div class="seg-track" id="ssize">'+SIZES.map(function(s,i){return '<button aria-pressed="'+(st.size===i)+'" data-size="'+i+'">'+s+'</button>'}).join("")+'</div><div class="seg-track" id="sreg"><button aria-pressed="'+(st.reg==="NZ")+'" data-reg="NZ">NZ</button><button aria-pressed="'+(st.reg==="OZ")+'" data-reg="OZ">Australia</button></div></div>';
-  else h+='<div class="row"><span class="small">Quantities</span><div class="seg-track"><button aria-pressed="'+(st.reg==="NZ")+'" data-reg="NZ">NZ</button><button aria-pressed="'+(st.reg==="OZ")+'" data-reg="OZ">Australia</button></div></div>';
+  if(r.sz===3)h+='<div class="row"><span class="small">Loaf size</span><div class="seg-track" id="ssize">'+SIZES.map(function(s,i){return '<button aria-pressed="'+(st.size===i)+'" data-size="'+i+'">'+s+'</button>'}).join("")+'</div></div>';
   if(x.note)h+='<p class="note">'+esc(x.note)+'</p>';
   if(x.rows.length)h+='<table class="ing"><tbody>'+x.rows.map(function(g){return '<tr'+(g.late?' class="late"':'')+'><td>'+esc(g.name)+'</td><td>'+esc(g.qty)+'</td></tr>'}).join("")+'</tbody></table>';
   else h+='<p class="note">This recipe uses the dough from another recipe; see the method.</p>';
@@ -207,7 +205,7 @@ function drawSheet(){
    h+='<div class="macros">'+[["Protein",p[1],p[1]*4/macroKcal,""],["Carbs",p[2],p[2]*4/macroKcal,"c"],["Fat",p[4],p[4]*9/macroKcal,"f"]].map(function(m){return '<div class="macro"><span>'+m[0]+'</span><div class="bar"><i class="'+m[3]+'" data-w="'+Math.round(m[2]*100)+'"></i></div><em>'+m[1].toFixed(1)+' g · '+Math.round(m[2]*100)+'%</em></div>'}).join("")+'</div>';
    var rowsN=[["Energy",p[0],t[0],"kcal",0],["Protein",p[1],t[1],"g",1],["Carbohydrate",p[2],t[2],"g",1],["of which sugars",p[3],t[3],"g",1],["Fat",p[4],t[4],"g",1],["Fibre",p[5],t[5],"g",1],["Salt",p[6]*2.5/1000,t[6]*2.5/1000,"g",2]];
    h+='<table class="nt"><thead><tr><th>Nutrient</th><th>Per serving</th><th>Whole batch</th></tr></thead><tbody>'+rowsN.map(function(q){return '<tr><td>'+q[0]+'</td><td>'+q[1].toFixed(q[4])+' '+q[3]+'</td><td>'+q[2].toFixed(q[4])+' '+q[3]+'</td></tr>'}).join("")+'</tbody></table>';
-   h+='<p class="small">Estimate calculated from the listed raw ingredients ('+st.reg+' quantities'+(r.sz===3?", size "+SIZES[st.size]:"")+', '+Math.round(n.w)+' g in total) using typical nutrient values per ingredient. Water lost in baking is not deducted, so values per 100 g of finished bread will be higher. Optional and "add later" items are included.</p>';
+   h+='<p class="small">Estimate calculated from the listed raw ingredients (NZ quantities'+(r.sz===3?", size "+SIZES[st.size]:"")+', '+Math.round(n.w)+' g in total) using typical nutrient values per ingredient. Water lost in baking is not deducted, so values per 100 g of finished bread will be higher. Optional and "add later" items are included.</p>';
   }
   h+='</div>';
  }else{
@@ -245,8 +243,7 @@ document.addEventListener("click",function(e){
  if(d.nav)return setView(d.nav);
  if(b.id==="theme"){var cur=document.documentElement.getAttribute("data-theme"),dark=cur?cur==="dark":window.matchMedia("(prefers-color-scheme: dark)").matches;document.documentElement.setAttribute("data-theme",dark?"light":"dark");save();return}
  if(d.gomenu){st.menu=d.gomenu;st.grp="All";st.q="";$("q").value="";drawChips();return setView("home")}
- if(d.reg){st.reg=d.reg;save()}
- else if(d.size!=null){st.size=+d.size;st.serves=null;save()}
+ if(d.size!=null){st.size=+d.size;st.serves=null;save()}
  else if(d.grp){st.grp=d.grp}
  else if(d.menu){st.menu=d.menu}
  else return;
