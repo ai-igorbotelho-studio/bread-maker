@@ -21,12 +21,17 @@ var N={
  olive:[115,.8,6,0,11,3,735,.6],mustard:[508,26,28,7,36,12,13,.4],vinegar:[18,0,0,0,0,0,2,1],xan:[333,0,78,0,0,78,0,.6],
  rum:[231,0,0,0,0,0,0,.95],vanilla:[288,0,13,13,0,0,9,.9],bpow:[53,0,28,0,0,0,10600,.9],bsoda:[0,0,0,0,0,0,27360,.9],pectin:[325,0,90,0,0,9,0,.6],
  straw:[32,.7,7.7,4.9,.3,2,1,1],blue:[57,.7,14,10,.3,2.4,1,1],rasp:[52,1.2,12,4.4,.7,6.5,1,1],peach:[39,.9,9.5,8.4,.3,1.5,0,1],berries:[45,1,10,6,.4,3.5,1,1],apple:[52,.3,14,10,.2,2.4,1,1],
- lemon:[22,.4,7,2.5,.2,.3,1,1],herb:[36,3,6,.5,.7,3,25,.2],spice:[250,10,60,1,6,30,30,.4],zero:[0,0,0,0,0,0,0,1]
+ lemon:[22,.4,7,2.5,.2,.3,1,1],
+ hemp:[553,31,9,1.5,49,4,5,.6],chia:[486,17,42,0,31,34,16,.6],pump:[559,30,11,1.4,49,6,7,.6],almond:[579,21,22,4,50,12,1,.5],pecan:[691,9,14,4,72,10,0,.5],cashew:[553,18,30,6,44,3,12,.55],peanut:[567,26,16,5,49,9,18,.6],
+ cranb:[308,0,82,65,1.4,5,3,.65],coconut:[660,7,24,7,65,16,37,.35],feta:[264,14,4,4,21,0,917,.5],bacon:[541,37,1.4,0,42,0,1717,.7],carrot:[41,.9,10,4.7,.2,2.8,69,.5],zucc:[17,1.2,3,2.5,.3,1,8,.6],spinach:[23,2.9,3.6,.4,.4,2.2,79,.3],
+ psyll:[200,1.5,89,0,0,78,20,.3],quinoa:[368,14,64,0,6,7,5,.6],millet:[378,11,73,0,4,9,5,.6],protein:[370,80,8,2,5,2,200,.4],jalap:[29,.9,6.5,4,.4,2.8,3,.6],herb:[36,3,6,.5,.7,3,25,.2],spice:[250,10,60,1,6,30,30,.4],zero:[0,0,0,0,0,0,0,1]
 };
 var RULES=[
+ [/hemp/,"hemp"],[/chia/,"chia"],[/pumpkin seed|pepita/,"pump"],[/almond/,"almond"],[/pecan/,"pecan"],[/cashew/,"cashew"],[/peanut/,"peanut"],[/cranberr/,"cranb"],[/coconut/,"coconut"],[/feta/,"feta"],[/bacon|salami|chorizo|ham/,"bacon"],
+ [/carrot/,"carrot"],[/zucchini|courgette/,"zucc"],[/spinach|kale/,"spinach"],[/psyllium/,"psyll"],[/quinoa/,"quinoa"],[/millet/,"millet"],[/protein powder|whey/,"protein"],[/jalape|capsicum/,"jalap"],[/flax/,"lin"],[/maple|molasses/,"syrup"],[/apricot|fig|prune/,"dried"],
  [/water/,"water"],[/surebake|yeast/,"yeast"],[/egg/,"egg"],[/powdered milk|milk powder/,"mpow"],[/yog/,"yog"],[/milk/,"milk"],
  [/gluten flour/,"gluten"],[/wholemeal|whole wheat|wholegrain|kibbled/,"wheat"],[/rye/,"rye"],[/rice flour|rice/,"rice"],[/arrowroot|tapioca/,"starch"],[/besan|soya/,"besan"],
- [/bread flour|white flour|plain flour|spelt|bread mix/,"flour"],[/oatmeal/,"oats"],[/buckwheat/,"buck"],[/cornmeal/,"corn"],[/bran/,"bran"],
+ [/bread flour|white flour|plain flour|spelt|bread mix/,"flour"],[/oat/,"oats"],[/buckwheat/,"buck"],[/cornmeal/,"corn"],[/bran/,"bran"],
  [/brown sugar/,"brown"],[/sugar/,"sugar"],[/honey/,"honey"],[/treacle|golden syrup/,"syrup"],[/butter/,"butter"],[/oil/,"oil"],[/salt/,"salt"],
  [/parmesan/,"parm"],[/cheese/,"cheese"],[/walnut/,"walnut"],[/pinenut/,"pine"],[/nuts/,"nuts"],[/sesame/,"sesame"],[/poppy/,"poppy"],[/sunflower/,"sunfl"],[/linseed/,"lin"],[/seed mix/,"seedmix"],
  [/raisin|sultana|currant|dried fruit/,"dried"],[/dates/,"dates"],[/banana chip/,"bchip"],[/banana/,"banana"],[/orange peel/,"peel"],[/orange rind|zest/,"rind"],[/choc/,"choc"],[/cocoa/,"cocoa"],
@@ -64,8 +69,9 @@ var SIZES=["M","L","XL"],GRPS=["All","Bread","Gluten free","Dough","Cake","Jam",
 var GCLASS={"Bread":"g-bread","Gluten free":"g-gluten","Dough":"g-dough","Cake":"g-cake","Jam":"g-jam","Compote":"g-compote"};
 var SERVES={"Bread":[12,14,16],"Gluten free":[12,12,12],"Dough":[12,12,12],"Cake":[10,10,10],"Jam":[20,20,20],"Compote":[20,20,20]};
 var st={view:"home",size:1,grp:"All",menu:"All",times:[],diet:[],q:"",favs:{},open:null,tab:"ing",step:0,serves:null};
-try{var sv=JSON.parse(localStorage.getItem("bm")||"{}");if(sv.size!=null)st.size=sv.size;if(sv.favs)st.favs=sv.favs;if(sv.theme)document.documentElement.setAttribute("data-theme",sv.theme)}catch(e){}
-function save(){try{localStorage.setItem("bm",JSON.stringify({size:st.size,favs:st.favs,theme:document.documentElement.getAttribute("data-theme")||""}))}catch(e){}}
+var CUSTOM=[];
+try{var sv=JSON.parse(localStorage.getItem("bm")||"{}");if(sv.custom){CUSTOM=sv.custom;CUSTOM.forEach(function(c){R.push(c)})}if(sv.size!=null)st.size=sv.size;if(sv.favs)st.favs=sv.favs;if(sv.theme)document.documentElement.setAttribute("data-theme",sv.theme)}catch(e){}
+function save(){try{localStorage.setItem("bm",JSON.stringify({size:st.size,favs:st.favs,custom:CUSTOM,theme:document.documentElement.getAttribute("data-theme")||""}))}catch(e){}}
 function $(i){return document.getElementById(i)}
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
 
@@ -102,7 +108,7 @@ var PHOTO={"White Loaf":"white","Rapid White Loaf":"white","Basic Sandwich Bread
  "Strawberry Jam":"strawberries","Blueberry Jam":"blueberries","Peach Melba":"peaches","Frozen Berry Jam":"raspberries",
  "Spiced Apple Compote":"apple","Mixed Berry Compote":"raspberries","Apple Sauce":"apples","Peach in Vanilla Syrup":"peaches"};
 var GPHOTO={"Bread":"white","Gluten free":"white","Dough":"rolls","Cake":"buttercake","Jam":"strawberries","Compote":"apples"};
-function photo(r){return "img/"+(PHOTO[r.n]||GPHOTO[r.g])+".jpg"}
+function photo(r){return "img/"+(PHOTO[r.p||r.n]||GPHOTO[r.g])+".jpg"}
 
 /* ---------- helpers ---------- */
 function regionRows(r){
@@ -126,13 +132,13 @@ function kcalPerServe(r){
 function filtered(){
  var q=st.q.trim().toLowerCase();
  return R.filter(function(r,i){
-  if(st.view==="saved"&&!st.favs[i])return false;
+  if(st.view==="saved"&&!st.favs[r.n])return false;
   if(st.grp!=="All"&&r.g!==st.grp)return false;
   if(st.menu!=="All"&&r.m.indexOf(st.menu)<0)return false;
   if(st.times.length){var mins=minutes(r.time),ok=TIMES.some(function(t){return st.times.indexOf(t[0])>=0&&mins>t[2]&&mins<=t[3]});if(!ok)return false}
   if(st.diet.some(function(k){return !diet(r,k)}))return false;
   if(q&&(r.n+" "+r.g+" menu "+r.m.join(" ")).toLowerCase().indexOf(q)<0)return false;
-  return true});
+  return true}).sort(function(a,b){return (b.custom?1:0)-(a.custom?1:0)});
 }
 function toast(msg){var t=$("toast");t.textContent=msg;t.classList.add("show");clearTimeout(toast.h);toast.h=setTimeout(function(){t.classList.remove("show")},1600)}
 
@@ -140,7 +146,7 @@ function toast(msg){var t=$("toast");t.textContent=msg;t.classList.add("show");c
 function drawChips(){
  $("chips").innerHTML=GRPS.map(function(g){return '<button class="chip" aria-pressed="'+(st.grp===g)+'" data-grp="'+esc(g)+'">'+esc(g)+'</button>'}).join("");
  var ms={};R.forEach(function(r){r.m.forEach(function(m){ms[m]=1})});
- $("mchips").innerHTML='<button class="chip'+(st.menu==="All"?" on":"")+'" data-menu="All">All menus</button>'+Object.keys(ms).sort().map(function(m){return '<button class="chip'+(st.menu===m?" on":"")+'" data-menu="'+m+'">Menu '+m+'</button>'}).join("");
+ $("mchips").innerHTML='<button class="chip'+(st.menu==="All"?" on":"")+'" data-menu="All">All menus</button>'+Object.keys(ms).sort().map(function(m){var mr=MENUS.filter(function(x){return x[0]===m})[0];return '<button class="chip'+(st.menu===m?" on":"")+'" data-menu="'+m+'">'+m+' '+esc(mr?mr[1]+(mr[2]==="Dough"&&m<"26"?" dough":""):"")+'</button>'}).join("");
  $("tchips").innerHTML='<span class="lbl">Time to bake</span>'+TIMES.map(function(t){return '<button class="chip" aria-pressed="'+(st.times.indexOf(t[0])>=0)+'" data-time="'+t[0]+'">'+t[1]+'</button>'}).join("")+'<span class="lbl">Diet</span>'+DIET.map(function(d){return '<button class="chip" aria-pressed="'+(st.diet.indexOf(d[0])>=0)+'" data-diet="'+d[0]+'" title="'+d[2]+'">'+d[1]+'</button>'}).join("")+(st.times.length||st.diet.length?'<button class="chip clear" data-clearf="1">Clear</button>':'');
  $("size").innerHTML=SIZES.map(function(s,i){return '<button aria-pressed="'+(st.size===i)+'" data-size="'+i+'">'+s+'</button>'}).join("");
 }
@@ -153,8 +159,8 @@ function drawCards(){
  $("cards").innerHTML=list.map(function(r,k){
   var i=R.indexOf(r),kc=kcalPerServe(r);
   return '<article class="card" style="animation-delay:'+Math.min(k,12)*40+'ms"><div class="visual '+GCLASS[r.g]+'" role="button" tabindex="0" data-open="'+i+'" aria-label="Open '+esc(r.n)+'"><img class="ph" src="'+photo(r)+'" alt="" loading="lazy" decoding="async">'+
-   '<button class="pill fav" data-fav="'+i+'" aria-pressed="'+!!st.favs[i]+'" aria-label="Save recipe">'+I.heart+'</button><span class="pill time">'+esc(r.time)+'</span><div class="title">'+esc(r.n)+'</div></div>'+
-   '<div class="card-foot"><div class="l"><span class="tag menu">Menu '+r.m.join(", ")+'</span><span class="tag">'+esc(r.g)+'</span></div>'+(kc!=null?'<span class="tag kcal">'+kc+' kcal / serve</span>':'')+'</div></article>'}).join("");
+   '<button class="pill fav" data-fav="'+i+'" aria-pressed="'+!!st.favs[r.n]+'" aria-label="Save recipe">'+I.heart+'</button><span class="pill time">'+esc(r.time)+'</span><div class="title">'+esc(r.n)+'</div></div>'+
+   '<div class="card-foot"><div class="l"><span class="tag menu">Menu '+r.m.join(", ")+'</span><span class="tag">'+esc(r.g)+'</span>'+(r.custom?'<span class="tag custom">Custom</span>':'')+'</div>'+(kc!=null?'<span class="tag kcal">'+kc+' kcal / serve</span>':'')+'</div></article>'}).join("");
 }
 function drawMenu(){
  var cnt={};R.forEach(function(r){r.m.forEach(function(m){cnt[m]=(cnt[m]||0)+1})});
@@ -168,8 +174,9 @@ function drawMenu(){
 }
 function setView(v){
  st.view=v;
- $("home").hidden=v==="menus";$("menu").hidden=v!=="menus";$("recipes").hidden=v==="menus";
- ["home","menus","saved"].forEach(function(k){$("nav-"+k).setAttribute("aria-pressed",v===k)});
+ $("home").hidden=v==="menus"||v==="create";$("menu").hidden=v!=="menus";$("recipes").hidden=v==="menus"||v==="create";$("create").hidden=v!=="create";
+ if(v==="create")drawCreate();
+ ["home","menus","saved","create"].forEach(function(k){$("nav-"+k).setAttribute("aria-pressed",v===k)});
  var n=Object.keys(st.favs).filter(function(k){return st.favs[k]}).length;$("favn").textContent=n;$("favn").hidden=!n;
  if(v!=="menus")drawCards();
  window.scrollTo({top:0,behavior:"smooth"});
@@ -202,6 +209,7 @@ function drawSheet(){
   else h+='<p class="note">This recipe uses the dough from another recipe; see the method.</p>';
   if(x.rows.some(function(g){return g.late}))h+='<p class="small">✱ Added later: through the raisin nut dispenser, or by hand when the machine beeps.</p>';
   if(r.note)h+='<p class="note warn">'+esc(r.note)+'</p>';
+  if(r.custom)h+='<div class="row"><span class="small">Your recipe, based on '+esc(r.p)+'</span><button class="btn" data-delcustom="'+esc(r.n)+'">Delete recipe</button></div>';
   h+='</div>';
  }else if(st.tab==="nut"){
   h+='<div class="pane">';
@@ -239,13 +247,113 @@ function drawSheet(){
  requestAnimationFrame(function(){Array.prototype.forEach.call($("sheet-body").querySelectorAll("[data-w]"),function(el){el.style.width=el.getAttribute("data-w")+"%"})});
 }
 
+
+/* ---------- create a recipe ---------- */
+var QUICK=[["Hemp seeds",30,"g"],["Chia seeds",20,"g"],["Pumpkin seeds",40,"g"],["Sunflower seeds",40,"g"],["Walnuts, chopped",50,"g"],["Rolled oats",40,"g"],["Grated cheese",60,"g"],["Olives, chopped",50,"g"],["Dried cranberries",60,"g"],["Chocolate chips",60,"g"],["Grated carrot",80,"g"],["Protein powder",30,"g"],["Mixed spice",1,"tsp"],["Honey",1,"tbsp"]];
+var UNITS=["g","tsp","tbsp","cup","mL"];
+var RAISIN_MAP={"01":"03","04":"06","13":"14","16":"17","18":"19","24":"25"};
+var cr={base:null,adds:[],q:""};
+function cls(name){var n=name.toLowerCase();
+ if(/seed|hemp|chia|linseed|flax|poppy|sesame|pepita/.test(n))return "seed";
+ if(/nut|almond|pecan|cashew|peanut/.test(n))return "nut";
+ if(/dried|raisin|sultana|currant|cranberr|date|apricot|fig|prune/.test(n))return "dried";
+ if(/oat|bran|quinoa|millet|psyllium|grain|flake/.test(n))return "grain";
+ if(/flour|powder|cocoa|whey/.test(n))return "powder";
+ if(/cheese|feta|parmesan|cheddar/.test(n))return "cheese";
+ if(/choc/.test(n))return "choc";
+ if(/olive|sundried|sun-dried|bacon|salami|chorizo|ham|jalape|capsicum/.test(n))return "savoury";
+ if(/fresh|grated|carrot|zucchini|courgette|kumara|banana|apple|pumpkin|spinach|kale|herb|basil|rosemary|onion|garlic/.test(n))return "fresh";
+ if(/honey|syrup|sugar|molasses|treacle|maple/.test(n))return "sweet";
+ if(/water|milk|juice|oil|butter|egg|yog/.test(n))return "liquid";
+ return "spice"}
+var WHERE={seed:"dispenser",nut:"dispenser",dried:"dispenser",grain:"dispenser"};
+function build(){
+ var b=cr.base;if(!b)return null;
+ var rows=regionRows(b).rows.map(function(r){return {name:r.name,qty:r.qty,late:r.late}});
+ var adj=0,warn=[],disp=cr.adds.length>0,addW=0,coarse=0;
+ cr.adds.forEach(function(a){var c=cls(a.name),g=grams(a.name,a.qty+" "+a.unit).g;addW+=g;
+  if(c==="grain")adj+=g;if(c==="powder")adj+=g*.8;if(/chia|psyllium/i.test(a.name))adj+=g*1.5;
+  if(c==="fresh")adj-=g*.5;if(c==="cheese")adj-=g*.2;
+  if(!WHERE[c])disp=false;if(c==="seed"||c==="nut")coarse+=g});
+ adj=Math.round(adj/5)*5;
+ var wi=-1;rows.forEach(function(r,i){if(wi<0&&/water/i.test(r.name)&&/ml/i.test(r.qty))wi=i});
+ var waterNote="";
+ if(adj&&wi>=0){var w=parseFloat(rows[wi].qty.replace(/[^\d.]/g,""));if(w){rows[wi].qty=Math.max(0,Math.round(w+adj))+" mL";waterNote=(adj>0?"Added ":"Removed ")+Math.abs(adj)+" mL of water (was "+w+" mL) because "+(adj>0?"oats, bran, chia and powders soak up liquid.":"fresh or moist add-ins release liquid.")}}
+ else if(adj&&wi<0)warn.push("This base recipe has no water line to adjust, so check the dough consistency by eye.");
+ var m0=b.m[0],menu=m0,where;
+ var noDisp=["07","09","12","20","26","27","15","22","23"].indexOf(m0)>=0;
+ if(b.g==="Jam"||b.g==="Compote"||b.g==="Cake")where="This is not a bread program, so quantities are not adjusted. Mix the add-ins in with the other ingredients.";
+ else if(disp&&!noDisp){menu=RAISIN_MAP[m0]||m0;where=RAISIN.indexOf(menu)>=0?"Put the add-ins in the raisin nut dispenser. The machine drops them in at the right moment.":"Add the extras to the pan with the other ingredients."}
+ else if(noDisp)where="This program does not use the raisin nut dispenser: put everything in the pan at the start.";
+ else where="Moist or sticky add-ins would stick in the dispenser, so put them in the pan with the other ingredients at the start.";
+ if(addW>150)warn.push("Add-ins total "+Math.round(addW)+" g. The manual allows up to 150 g; reduce them or the loaf may not rise well.");
+ if(coarse>60)warn.push("Seeds and nuts total "+Math.round(coarse)+" g. Large hard seeds can scratch the pan coating and nuts weaken the gluten, so the manual suggests keeping them modest (around 50 g).");
+ var useDisp=RAISIN.indexOf(menu)>=0&&disp&&!noDisp&&b.g!=="Jam"&&b.g!=="Compote"&&b.g!=="Cake";
+ cr.adds.forEach(function(a){rows.push({name:a.name,qty:a.qty+" "+a.unit,late:useDisp})});
+ var mrow=MENUS.filter(function(m){return m[0]===menu})[0];
+ return {rows:rows,menu:menu,where:where,warn:warn,waterNote:waterNote,time:mrow?mrow[10]:b.time,timer:b.timer&&!useDisp?1:(mrow&&mrow[5]==="●"?1:0),addW:addW};
+}
+function nutRows(rows){return nutrition(rows.map(function(r){return {name:r.name,qty:r.qty}}))}
+function drawCreate(){
+ var h='<div class="panel"><div class="section-head" style="margin:0 0 12px"><h2>Create a recipe</h2><span class="count">Step '+(cr.base?(cr.adds.length?3:2):1)+' of 3</span></div>';
+ var bases=R.filter(function(c){return !c.custom});
+ if(!cr.base){
+  h+='<p class="small">Start from one of the manual\'s recipes. Your add-ins and the adjusted quantities build on it.</p>';
+  h+='<label class="search" style="margin:10px 0"><input type="search" id="c-q" placeholder="Find a base recipe" value="'+esc(cr.q)+'" autocomplete="off"></label><div class="pick">';
+  var q=cr.q.toLowerCase();
+  bases.forEach(function(r,i){if(q&&(r.n+" "+r.g).toLowerCase().indexOf(q)<0)return;h+='<button class="pickb" data-pick="'+i+'"><img src="'+photo(r)+'" alt=""><span><b>'+esc(r.n)+'</b><small>'+esc(r.g)+' · Menu '+r.m.join(", ")+' · '+esc(r.time)+'</small></span></button>'});
+  h+='</div></div>';
+ }else{
+  var b=cr.base;
+  h+='<div class="basecard"><img src="'+photo(b)+'" alt=""><div><span class="small">Based on</span><b>'+esc(b.n)+'</b><small>'+esc(b.g)+' · Menu '+b.m.join(", ")+(b.sz===3?' · size '+SIZES[st.size]:'')+'</small></div><button class="btn" data-cbase="1">Change</button></div>';
+  h+='<h3>Add ingredients</h3><div class="chips wrapc">'+QUICK.map(function(q,i){return '<button class="chip" data-quick="'+i+'">+ '+esc(q[0])+'</button>'}).join("")+'</div>';
+  h+='<div class="addrow"><input id="c-name" placeholder="Ingredient, e.g. hemp seeds" autocomplete="off"><input id="c-qty" type="number" min="0" step="0.5" placeholder="Qty" inputmode="decimal"><select id="c-unit">'+UNITS.map(function(u){return '<option>'+u+'</option>'}).join("")+'</select><button class="btn dark" data-addrow="1">Add</button></div>';
+  if(cr.adds.length)h+='<ul class="adds">'+cr.adds.map(function(a,i){return '<li><span>'+esc(a.name)+'</span><b>'+a.qty+' '+a.unit+'</b><button class="rm" data-rm="'+i+'" aria-label="Remove">'+I.x+'</button></li>'}).join("")+'</ul>';
+  h+='</div>';
+  var out=build();
+  if(out&&cr.adds.length){
+   var base=nutRows(regionRows(b).rows),nw=nutRows(out.rows),s=serves(b),p0=base.t.map(function(v){return v/s}),p1=nw.t.map(function(v){return v/s});
+   h+='<div class="panel result"><div class="section-head" style="margin:0 0 12px"><h2>Your recipe</h2><span class="count">'+out.rows.length+' ingredients</span></div>';
+   h+='<div class="pills2"><span class="t">Menu '+out.menu+'</span><span>'+esc(out.time)+'</span><span>'+(out.timer?"Timer OK":"No delayed start")+'</span>'+(b.sz===3?'<span>Size '+SIZES[st.size]+'</span>':'')+'</div>';
+   h+='<p class="note">'+esc(out.where)+'</p>';
+   if(out.waterNote)h+='<p class="note">'+esc(out.waterNote)+'</p>';
+   out.warn.forEach(function(w){h+='<p class="note warn">'+esc(w)+'</p>'});
+   h+='<table class="ing"><tbody>'+out.rows.map(function(r){return '<tr'+(r.late?' class="late"':'')+'><td>'+esc(r.name)+'</td><td>'+esc(r.qty)+'</td></tr>'}).join("")+'</tbody></table>';
+   if(out.rows.some(function(r){return r.late}))h+='<p class="small">✱ Goes in the raisin nut dispenser.</p>';
+   var cmp=[["Energy",0,"kcal",0],["Protein",1,"g",1],["Carbs",2,"g",1],["Fat",4,"g",1],["Fibre",5,"g",1]];
+   h+='<h3>Per serving, base vs yours</h3><table class="nt"><thead><tr><th>Nutrient</th><th>'+esc(b.n)+'</th><th>Yours</th></tr></thead><tbody>'+cmp.map(function(c){var dlt=p1[c[1]]-p0[c[1]];return '<tr><td>'+c[0]+'</td><td>'+p0[c[1]].toFixed(c[3])+' '+c[2]+'</td><td><b>'+p1[c[1]].toFixed(c[3])+' '+c[2]+'</b> <span class="dlt '+(dlt>=0?"up":"dn")+'">'+(dlt>=0?"+":"−")+Math.abs(dlt).toFixed(c[3])+'</span></td></tr>'}).join("")+'</tbody></table>';
+   h+='<div class="addrow save"><input id="c-title" placeholder="Name your recipe" value="'+esc(b.n+" with "+cr.adds.map(function(a){return a.name.toLowerCase().split(",")[0]}).join(", "))+'"><button class="btn olive" data-savecustom="1">Save recipe</button></div></div>';
+  }
+ }
+ $("create").innerHTML=h;
+ var cq=$("c-q");if(cq){cq.addEventListener("input",function(e){cr.q=e.target.value;var at=e.target.selectionStart;drawCreate();var n=$("c-q");n.focus();n.setSelectionRange(at,at)})}
+}
+function saveCustom(){
+ var out=build(),b=cr.base,name=($("c-title").value||"").trim();
+ if(!name){toast("Give the recipe a name");return}
+ if(R.some(function(c){return c.n===name})){toast("A recipe with that name already exists");return}
+ var rec={n:name,g:b.g,m:[out.menu],time:out.time,timer:out.timer,sz:1,custom:true,p:b.n,
+  both:out.rows.map(function(r){return (r.late?"*":"")+r.name+"|"+r.qty}),
+  note:out.where+(out.waterNote?" "+out.waterNote:"")+(out.warn.length?" "+out.warn.join(" "):""),
+  steps:b.steps?b.steps.slice():["Put the kneading blade in the pan. Add the ingredients in the order listed"+(out.rows.some(function(r){return r.late})?", with the ✱ items in the raisin nut dispenser":"")+".","Select menu "+out.menu+(b.sz===3?", size "+SIZES[st.size]:"")+" and press Start.","When the machine beeps 8 times and the bar at ‘End’ flashes, remove the bread and leave it to cool."]};
+ CUSTOM.push(rec);R.push(rec);save();cr={base:null,adds:[],q:""};
+ toast("Saved: "+name);st.grp="All";st.menu="All";st.times=[];st.diet=[];st.q="";$("q").value="";drawChips();setView("home");
+}
+
 /* ---------- events ---------- */
 document.addEventListener("click",function(e){
  var b=e.target.closest("button,[data-open]");if(!b)return;
  var d=b.dataset;
  if(d.open!=null)return openSheet(+d.open);
- if(d.fav!=null){st.favs[d.fav]=!st.favs[d.fav];b.setAttribute("aria-pressed",!!st.favs[d.fav]);save();toast(st.favs[d.fav]?"Saved to your recipes":"Removed from saved");var n=Object.keys(st.favs).filter(function(k){return st.favs[k]}).length;$("favn").textContent=n;$("favn").hidden=!n;if(st.view==="saved")drawCards();return}
+ if(d.fav!=null){var fn=R[d.fav].n;st.favs[fn]=!st.favs[fn];b.setAttribute("aria-pressed",!!st.favs[fn]);save();toast(st.favs[fn]?"Saved to your recipes":"Removed from saved");var n=Object.keys(st.favs).filter(function(k){return st.favs[k]}).length;$("favn").textContent=n;$("favn").hidden=!n;if(st.view==="saved")drawCards();return}
  if(b.id==="close"||d.close)return closeSheet();
+ if(d.delcustom){CUSTOM=CUSTOM.filter(function(c){return c.n!==d.delcustom});var ri=R.findIndex(function(c){return c.n===d.delcustom});if(ri>=0)R.splice(ri,1);delete st.favs[d.delcustom];save();closeSheet();drawCards();toast("Recipe deleted");return}
+ if(d.pick){cr.base=R.filter(function(c){return !c.custom})[+d.pick]||null;cr.adds=cr.adds;return drawCreate()}
+ if(d.quick){var qk=QUICK[+d.quick];cr.adds.push({name:qk[0],qty:qk[1],unit:qk[2]});return drawCreate()}
+ if(d.addrow){var nm=$("c-name").value.trim(),qv=parseFloat($("c-qty").value);if(!nm||!(qv>0)){toast("Enter an ingredient and a quantity");return}cr.adds.push({name:nm,qty:qv,unit:$("c-unit").value});return drawCreate()}
+ if(d.rm!=null){cr.adds.splice(+d.rm,1);return drawCreate()}
+ if(d.savecustom){return saveCustom()}
+ if(d.cbase){cr.base=null;cr.adds=[];return drawCreate()}
  if(d.tab){st.tab=d.tab;return drawSheet()}
  if(d.step!=null){st.step=+d.step;return drawSheet()}
  if(d.serves){st.serves=Math.max(1,(st.serves||serves(R[st.open]))+ +d.serves);return drawSheet()}
