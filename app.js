@@ -63,7 +63,7 @@ function nutrition(rows){
 var SIZES=["M","L","XL"],GRPS=["All","Bread","Gluten free","Dough","Cake","Jam","Compote"];
 var GCLASS={"Bread":"g-bread","Gluten free":"g-gluten","Dough":"g-dough","Cake":"g-cake","Jam":"g-jam","Compote":"g-compote"};
 var SERVES={"Bread":[12,14,16],"Gluten free":[12,12,12],"Dough":[12,12,12],"Cake":[10,10,10],"Jam":[20,20,20],"Compote":[20,20,20]};
-var st={view:"home",size:1,grp:"All",menu:"All",q:"",favs:{},open:null,tab:"ing",step:0,serves:null};
+var st={view:"home",size:1,grp:"All",menu:"All",times:[],diet:[],q:"",favs:{},open:null,tab:"ing",step:0,serves:null};
 try{var sv=JSON.parse(localStorage.getItem("bm")||"{}");if(sv.size!=null)st.size=sv.size;if(sv.favs)st.favs=sv.favs;if(sv.theme)document.documentElement.setAttribute("data-theme",sv.theme)}catch(e){}
 function save(){try{localStorage.setItem("bm",JSON.stringify({size:st.size,favs:st.favs,theme:document.documentElement.getAttribute("data-theme")||""}))}catch(e){}}
 function $(i){return document.getElementById(i)}
@@ -113,6 +113,11 @@ function regionRows(r){
  return {rows:rows,note:note};
 }
 function serves(r){var m=r.n.match(/\((\d+)\)/);return m?+m[1]:SERVES[r.g][r.sz===3?st.size:0]}
+var TIMES=[["u1","Under 1 hr",0,60],["t12","1–2 hr",60,120],["t24","2–4 hr",120,240],["o4","Over 4 hr",240,1e9]];
+var DIET=[["lowcarb","Low carb","60% or less of energy from carbohydrate"],["protein","High protein","14% or more of energy from protein"]];
+function minutes(t){var last=t.split("–").pop(),h=last.match(/(\d+)\s*hr/),m=last.match(/(\d+)\s*min/);return (h?+h[1]*60:0)+(m?+m[1]:0)}
+function shares(r){var x=regionRows(r);if(!x.rows.length)return null;var t=nutrition(x.rows).t,k=t[1]*4+t[2]*4+t[4]*9||1;return {carb:t[2]*4/k,prot:t[1]*4/k}}
+function diet(r,key){var s=shares(r);if(!s)return false;return key==="lowcarb"?s.carb<=.6:s.prot>=.14}
 function kcalPerServe(r){
  var x=regionRows(r);if(!x.rows.length)return null;
  var n=nutrition(x.rows),s=serves(r);
@@ -124,6 +129,8 @@ function filtered(){
   if(st.view==="saved"&&!st.favs[i])return false;
   if(st.grp!=="All"&&r.g!==st.grp)return false;
   if(st.menu!=="All"&&r.m.indexOf(st.menu)<0)return false;
+  if(st.times.length){var mins=minutes(r.time),ok=TIMES.some(function(t){return st.times.indexOf(t[0])>=0&&mins>t[2]&&mins<=t[3]});if(!ok)return false}
+  if(st.diet.some(function(k){return !diet(r,k)}))return false;
   if(q&&(r.n+" "+r.g+" menu "+r.m.join(" ")).toLowerCase().indexOf(q)<0)return false;
   return true});
 }
@@ -134,12 +141,14 @@ function drawChips(){
  $("chips").innerHTML=GRPS.map(function(g){return '<button class="chip" aria-pressed="'+(st.grp===g)+'" data-grp="'+esc(g)+'">'+esc(g)+'</button>'}).join("");
  var ms={};R.forEach(function(r){r.m.forEach(function(m){ms[m]=1})});
  $("mchips").innerHTML='<button class="chip'+(st.menu==="All"?" on":"")+'" data-menu="All">All menus</button>'+Object.keys(ms).sort().map(function(m){return '<button class="chip'+(st.menu===m?" on":"")+'" data-menu="'+m+'">Menu '+m+'</button>'}).join("");
+ $("tchips").innerHTML='<span class="lbl">Time to bake</span>'+TIMES.map(function(t){return '<button class="chip" aria-pressed="'+(st.times.indexOf(t[0])>=0)+'" data-time="'+t[0]+'">'+t[1]+'</button>'}).join("")+'<span class="lbl">Diet</span>'+DIET.map(function(d){return '<button class="chip" aria-pressed="'+(st.diet.indexOf(d[0])>=0)+'" data-diet="'+d[0]+'" title="'+d[2]+'">'+d[1]+'</button>'}).join("")+(st.times.length||st.diet.length?'<button class="chip clear" data-clearf="1">Clear</button>':'');
  $("size").innerHTML=SIZES.map(function(s,i){return '<button aria-pressed="'+(st.size===i)+'" data-size="'+i+'">'+s+'</button>'}).join("");
 }
 function drawCards(){
  var list=filtered();
  $("count").textContent=list.length+" of "+R.length;
- $("head").textContent=st.view==="saved"?"Saved recipes":(st.grp==="All"?"All recipes":st.grp);
+ var fl=st.diet.map(function(k){return DIET.filter(function(d){return d[0]===k})[0][1].toLowerCase()});
+ $("head").textContent=(st.view==="saved"?"Saved recipes":(st.grp==="All"?"All recipes":st.grp))+(fl.length?" · "+fl.join(" + "):"")+(st.times.length?" · "+st.times.length+" time range"+(st.times.length>1?"s":""):"");
  if(!list.length){$("cards").innerHTML='<div class="empty">'+(st.view==="saved"?"No saved recipes yet. Tap the heart on a recipe to keep it here.":"Nothing matches. Clear the search or pick another filter.")+'</div>';return}
  $("cards").innerHTML=list.map(function(r,k){
   var i=R.indexOf(r),kc=kcalPerServe(r);
@@ -246,6 +255,9 @@ document.addEventListener("click",function(e){
  if(d.size!=null){st.size=+d.size;st.serves=null;save()}
  else if(d.grp){st.grp=d.grp}
  else if(d.menu){st.menu=d.menu}
+ else if(d.time){var i=st.times.indexOf(d.time);i<0?st.times.push(d.time):st.times.splice(i,1)}
+ else if(d.diet){var j=st.diet.indexOf(d.diet);j<0?st.diet.push(d.diet):st.diet.splice(j,1)}
+ else if(d.clearf){st.times=[];st.diet=[]}
  else return;
  drawChips();if(st.open!=null)drawSheet();else drawCards();
 });

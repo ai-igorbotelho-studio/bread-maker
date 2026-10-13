@@ -47,6 +47,10 @@ button:focus-visible,input:focus-visible,[tabindex]:focus-visible{outline:2px so
 .chip:hover{transform:translateY(-1px)}
 .chip[aria-pressed="true"]{background:var(--ink);color:#fff}
 .chip.on{background:var(--terra);color:#fff}
+.chips .lbl{flex:none;align-self:center;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;padding:0 4px 0 2px}
+.chips .lbl+.chip{margin-left:0}
+#tchips .chip[aria-pressed="true"]{background:var(--olive);color:#fff}
+.chip.clear{background:var(--terra-soft);color:var(--terra)}
 .settings{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center}
 .seg{display:inline-flex;align-items:center;gap:8px}
 .seg>span{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
@@ -90,8 +94,8 @@ button:focus-visible,input:focus-visible,[tabindex]:focus-visible{outline:2px so
 @keyframes pop{0%{transform:scale(.6)}60%{transform:scale(1.3)}100%{transform:scale(1)}}
 .title{position:absolute;left:16px;right:16px;bottom:14px;color:#fff;font-weight:700;font-size:17px;line-height:1.25;text-wrap:balance;z-index:1;text-shadow:0 2px 10px rgba(0,0,0,.4);z-index:2}
 .card-foot{display:grid;grid-template-columns:1fr auto;align-items:center;gap:8px;padding:12px 14px 14px}
-.card-foot .l{display:flex;gap:6px;flex-wrap:wrap}
-.tag{font-size:12px;font-weight:700;padding:5px 11px;border-radius:999px;background:var(--chip);color:var(--fg);white-space:nowrap}
+.card-foot .l{display:flex;gap:5px;flex-wrap:nowrap;min-width:0}
+.tag{font-size:11.5px;font-weight:700;padding:4px 9px;border-radius:999px;background:var(--chip);color:var(--fg);white-space:nowrap}
 .tag.menu{background:var(--olive-soft);color:var(--olive)}
 .tag.kcal{background:var(--terra-soft);color:var(--terra)}
 .empty{background:var(--card);border-radius:var(--r);padding:36px;text-align:center;color:var(--muted);box-shadow:var(--shadow)}
