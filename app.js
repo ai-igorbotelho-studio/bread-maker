@@ -85,6 +85,25 @@ var I={
 };
 var GICON={"Bread":I.loaf,"Gluten free":I.loaf,"Dough":I.roll,"Cake":I.cake,"Jam":I.jar,"Compote":I.bowl};
 
+
+/* ---------- photos (Unsplash License, self-hosted in img/) ---------- */
+var PHOTO={"White Loaf":"white","Rapid White Loaf":"white","Basic Sandwich Bread":"white","Kumara Bread":"white","Cheese & Mustard Loaf":"white","Mexican Chilli Loaf":"white","Curry & Onion Loaf":"white",
+ "Wheat and Gluten Free Bread":"white","Yeasted Plain Gluten Free Loaf":"white",
+ "Garlic Herb Bread":"rustic","Rosemary & Pinenut Loaf":"rustic","Spelt White Bread":"rustic","Rosemary & Thyme Loaf":"basket",
+ "Italian Bread":"roundloaf","Herb Bread":"roundloaf","Sundried Tomato and Parmesan":"roundloaf",
+ "French Bread":"baguette","Tarragon & Thyme Bread":"baguette","French Bread (dough)":"baguette",
+ "Wholemeal Loaf 75%":"wholemeal","Wholemeal Loaf 100%":"wholemeal","Wholemeal Loaf 50%":"wholemeal","Rapid Wholemeal Loaf 75%":"wholemeal","Whole Wheat Sandwich Bread":"wholemeal","Sesame & Bran Loaf":"wholemeal",
+ "Rye 100%":"rye","Rye and Wholemeal":"rye","Mixed Grain Bread":"rye","Rye and Spelt":"ryeslice","Whole Spelt Bread":"ryeslice","Rye & White Rolls (stage 1)":"basket","Rye & White Rolls (stage 2)":"basket",
+ "Chocolate Nut Bread":"chocslice","Chocolate Cake":"chocolatecake","Butter Cake":"buttercake","Fruit & Walnut Cake":"berrycake",
+ "Banana Yoghurt Tea Bread":"loafcake","Date & Nut Loaf":"loafcake","Spicy Fruit Loaf":"loafcake","Spicy Fruit Loaf (wholemeal)":"loafcake","Banana Cinnamon Loaf":"loafcake","Orange Poppyseed Loaf":"loafcake",
+ "Basic Brioche":"pastries","Chocolate Chip Brioche Rolls (12)":"pastries","Pannettone":"bakery",
+ "Basic Dough":"rolls","Wholemeal Dough 75%":"rolls","Olive & Rosemary Rolls":"rolls","Sundried Tomato & Basil Rolls":"rolls","Sunflower & Kibblewheat Rolls":"rolls","Spelt Table Rolls (8)":"rolls","Whole Wheat Raisin Rolls":"rolls",
+ "Croissants":"croissants","Doughnuts":"doughnuts","Hot Cross Buns":"cinnamon","Swedish Tea Ring":"cinnamon","Bagels":"bagels","Pizza":"pizza","Focaccia":"focaccia",
+ "Strawberry Jam":"strawberries","Blueberry Jam":"blueberries","Peach Melba":"peaches","Frozen Berry Jam":"raspberries",
+ "Spiced Apple Compote":"apple","Mixed Berry Compote":"raspberries","Apple Sauce":"apples","Peach in Vanilla Syrup":"peaches"};
+var GPHOTO={"Bread":"white","Gluten free":"white","Dough":"rolls","Cake":"buttercake","Jam":"strawberries","Compote":"apples"};
+function photo(r){return "img/"+(PHOTO[r.n]||GPHOTO[r.g])+".jpg"}
+
 /* ---------- helpers ---------- */
 function regionRows(r){
  var key=st.reg==="NZ"?"nz":"oz",other=key==="nz"?"oz":"nz",d=r.both||r[key],note="";
@@ -125,7 +144,7 @@ function drawCards(){
  if(!list.length){$("cards").innerHTML='<div class="empty">'+(st.view==="saved"?"No saved recipes yet. Tap the heart on a recipe to keep it here.":"Nothing matches. Clear the search or pick another filter.")+'</div>';return}
  $("cards").innerHTML=list.map(function(r,k){
   var i=R.indexOf(r),kc=kcalPerServe(r);
-  return '<article class="card" style="animation-delay:'+Math.min(k,12)*40+'ms"><div class="visual '+GCLASS[r.g]+'" role="button" tabindex="0" data-open="'+i+'" aria-label="Open '+esc(r.n)+'">'+GICON[r.g]+
+  return '<article class="card" style="animation-delay:'+Math.min(k,12)*40+'ms"><div class="visual '+GCLASS[r.g]+'" role="button" tabindex="0" data-open="'+i+'" aria-label="Open '+esc(r.n)+'"><img class="ph" src="'+photo(r)+'" alt="" loading="lazy" decoding="async">'+
    '<button class="pill fav" data-fav="'+i+'" aria-pressed="'+!!st.favs[i]+'" aria-label="Save recipe">'+I.heart+'</button><span class="pill time">'+esc(r.time)+'</span><div class="title">'+esc(r.n)+'</div></div>'+
    '<div class="card-foot"><div class="l"><span class="tag menu">Menu '+r.m.join(", ")+'</span><span class="tag">'+esc(r.g)+'</span></div>'+(kc!=null?'<span class="tag kcal">'+kc+' kcal / serve</span>':'')+'</div></article>'}).join("");
 }
@@ -152,7 +171,7 @@ function setView(v){
 function openSheet(i){
  st.open=i;st.tab="ing";st.step=0;st.serves=null;
  var r=R[i];
- $("sheet-hero").className="sheet-hero "+GCLASS[r.g];
+ $("sheet-hero").className="sheet-hero "+GCLASS[r.g];$("sheet-hero").style.backgroundImage="url('"+photo(r)+"')";
  $("sheet-title").textContent=r.n;
  $("sheet-pills").innerHTML='<span class="t">'+esc(r.time)+'</span><span>Menu '+r.m.join(", ")+'</span><span>'+esc(r.g)+'</span><span>'+(r.timer?"Timer OK":"No delayed start")+'</span>';
  drawSheet();
